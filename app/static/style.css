@@ -1,0 +1,321 @@
+/* Emotion Responder dashboard: soft pastel, minimal.
+   One rule: colour means emotion. Each emotion has a pastel fill and a deeper ink for text. */
+
+:root {
+  --canvas: #fbf7f2;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-solid: #ffffff;
+  --ink: #3a3650;
+  --ink-2: #5a5672;
+  --ink-3: #6f6b86;
+  --line: #e9e2ea;
+  --line-soft: #f1ecf2;
+
+  /* pastel fills */
+  --joy: #f6d98b;
+  --sadness: #a9c7f0;
+  --anger: #f2a9a0;
+  --fear: #c9b6ea;
+  --disgust: #b4ddb9;
+  --surprise: #f5b8d2;
+  --neutral: #d2d5de;
+
+  /* deeper ink of each emotion, for text on its own tint */
+  --joy-ink: #7a5a00;
+  --sadness-ink: #24508f;
+  --anger-ink: #9a342b;
+  --fear-ink: #5e3d9a;
+  --disgust-ink: #2f6b3d;
+  --surprise-ink: #9b3c68;
+  --neutral-ink: #565a69;
+
+  --mood: var(--neutral);
+  --radius: 16px;
+  --radius-sm: 12px;
+  --shadow: 0 1px 2px rgba(58, 54, 80, 0.04), 0 8px 24px rgba(58, 54, 80, 0.05);
+  --font-body: "DM Sans", "Nirmala UI", "Noto Sans Gujarati", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "DM Sans", Georgia, serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --canvas: #1b1927;
+    --surface: rgba(255, 255, 255, 0.05);
+    --surface-solid: #25223a;
+    --ink: #ece9f6;
+    --ink-2: #c3bfd6;
+    --ink-3: #9d99b5;
+    --line: #34304c;
+    --line-soft: #2a2740;
+
+    --joy: #e8cd85;
+    --sadness: #8fb2e6;
+    --anger: #e69a92;
+    --fear: #b7a3de;
+    --disgust: #9ccda2;
+    --surprise: #e8a6c2;
+    --neutral: #8f93a6;
+
+    --joy-ink: #f3dc96;
+    --sadness-ink: #b4cff5;
+    --anger-ink: #f5b5ad;
+    --fear-ink: #d6c8f2;
+    --disgust-ink: #b9e2be;
+    --surprise-ink: #f7c3d9;
+    --neutral-ink: #c4c7d4;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+}
+
+body[data-mood="joy"] { --mood: var(--joy); }
+body[data-mood="sadness"] { --mood: var(--sadness); }
+body[data-mood="anger"] { --mood: var(--anger); }
+body[data-mood="fear"] { --mood: var(--fear); }
+body[data-mood="disgust"] { --mood: var(--disgust); }
+body[data-mood="surprise"] { --mood: var(--surprise); }
+
+* { box-sizing: border-box; }
+html { background: var(--canvas); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* a soft glow that takes the colour of the latest mood */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60vw 45vh at 12% -8%, color-mix(in srgb, var(--mood) 38%, transparent), transparent 70%),
+    radial-gradient(55vw 40vh at 100% 0%, color-mix(in srgb, var(--fear) 22%, transparent), transparent 70%),
+    radial-gradient(50vw 40vh at 50% 110%, color-mix(in srgb, var(--sadness) 18%, transparent), transparent 70%);
+  transition: background 1.2s ease;
+}
+
+h1, h2 { font-family: var(--font-display); margin: 0; font-weight: 500; letter-spacing: -0.01em; }
+h1 { font-size: 30px; line-height: 1.1; display: flex; align-items: center; gap: 12px; }
+h2 { font-size: 18px; margin-bottom: 12px; }
+
+/* little logo: four mood petals */
+h1::before {
+  content: "";
+  width: 30px; height: 30px; flex: none; border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, var(--joy) 0 28%, transparent 30%),
+    radial-gradient(circle at 70% 30%, var(--surprise) 0 28%, transparent 30%),
+    radial-gradient(circle at 30% 70%, var(--sadness) 0 28%, transparent 30%),
+    radial-gradient(circle at 70% 70%, var(--fear) 0 28%, transparent 30%);
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+:focus-visible { outline: 2px solid var(--fear-ink); outline-offset: 2px; }
+
+.app { max-width: 1340px; margin: 0 auto; padding: 0 24px 48px; }
+
+/* --- top bar ------------------------------------------------------------ */
+
+.top {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 28px 0 18px;
+}
+.brand p { margin: 6px 0 0 42px; color: var(--ink-3); font-size: 14px; }
+.top-actions { display: flex; align-items: center; gap: 14px; }
+
+.status {
+  display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 14px;
+  padding: 6px 14px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line);
+}
+.dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 2px solid var(--ink-3); background: transparent; display: inline-block;
+}
+.status[data-state="running"] .dot { background: var(--disgust); border-color: var(--disgust-ink); }
+.status[data-state="starting"] .dot,
+.status[data-state="waiting_login"] .dot,
+.status[data-state="stopping"] .dot {
+  background: linear-gradient(90deg, var(--joy) 50%, transparent 50%); border-color: var(--joy-ink);
+}
+.status[data-state="error"] .dot { border-radius: 3px; background: var(--anger); border-color: var(--anger-ink); }
+
+/* --- buttons and form controls ------------------------------------------ */
+
+.btn {
+  font: inherit; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface-solid); color: var(--ink);
+  padding: 9px 20px; border-radius: 999px; transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.btn:hover { background: var(--line-soft); }
+.btn.primary { background: var(--ink); color: var(--canvas); border-color: var(--ink); box-shadow: var(--shadow); }
+.btn.primary:hover { transform: translateY(-1px); background: var(--ink); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.link-btn {
+  font: inherit; font-size: 14px; background: none; border: 0; padding: 4px 0;
+  color: var(--ink-3); text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.link-btn:hover { color: var(--ink); }
+
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; font: inherit; color: var(--ink); background: var(--surface-solid);
+  border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 9px 12px;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--fear); outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb, var(--fear) 35%, transparent); }
+textarea { resize: vertical; }
+
+.notice {
+  margin: 0 0 14px; padding: 12px 16px; border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--joy) 70%, transparent);
+  background: color-mix(in srgb, var(--joy) 30%, var(--surface-solid)); color: var(--ink); font-weight: 500;
+}
+
+/* --- mood strip --------------------------------------------------------- */
+
+.strip-zone {
+  padding: 18px 22px 14px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 4px); box-shadow: var(--shadow); backdrop-filter: blur(6px);
+}
+.strip { display: flex; align-items: flex-end; gap: 5px; height: 84px; }
+.tick {
+  flex: 1 1 0; min-width: 6px; max-width: 28px; border-radius: 999px;
+  background: var(--hue, var(--neutral)); transition: height 0.4s ease;
+}
+.tick.h-full { height: 100%; }
+.tick.h-mid { height: 62%; }
+.tick.h-low { height: 26%; opacity: 0.6; }
+.strip-empty { color: var(--ink-3); align-self: center; font-size: 14px; }
+.caption { margin: 10px 0 0; color: var(--ink-3); font-size: 13px; }
+
+/* --- three-column layout ------------------------------------------------ */
+
+.grid {
+  display: grid; gap: 20px; margin-top: 20px;
+  grid-template-columns: 290px minmax(0, 1fr) 300px;
+  align-items: start;
+}
+.col {
+  min-width: 0; padding: 22px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 4px); box-shadow: var(--shadow); backdrop-filter: blur(6px);
+}
+
+/* settings */
+fieldset { border: 0; margin: 0 0 20px; padding: 0; }
+legend { font-family: var(--font-display); font-size: 17px; margin-bottom: 10px; padding: 0; }
+.mode {
+  display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm); margin-bottom: 8px;
+  cursor: pointer; background: var(--surface-solid); transition: background 0.2s, border-color 0.2s;
+}
+.mode:has(input:checked) {
+  border-color: var(--fear); background: color-mix(in srgb, var(--fear) 22%, var(--surface-solid));
+}
+.mode input { margin-top: 4px; accent-color: var(--fear-ink); }
+.mode strong { display: block; font-weight: 600; }
+.mode small { color: var(--ink-3); }
+
+.field { margin-bottom: 14px; }
+.field label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+.field small { display: block; color: var(--ink-3); margin-top: 5px; font-size: 13px; }
+.field.inline { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.field.inline label { margin: 0; font-weight: 500; }
+.field.inline input { width: 76px; }
+
+.more { margin-bottom: 16px; }
+.more summary { cursor: pointer; font-weight: 600; margin-bottom: 12px; color: var(--ink-2); }
+.check { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; font-size: 14px; color: var(--ink-2); }
+.check input { margin-top: 3px; accent-color: var(--fear-ink); }
+
+.form-actions { display: flex; align-items: center; gap: 12px; }
+.saved { color: var(--ink-3); font-size: 14px; }
+
+/* conversation */
+.feed-head { display: flex; align-items: baseline; justify-content: space-between; }
+.feed { max-height: 62vh; overflow-y: auto; padding-right: 6px; }
+.empty { color: var(--ink-3); padding: 24px 0; max-width: 46ch; }
+
+.xchg {
+  --tint: color-mix(in srgb, var(--hue, var(--neutral)) 22%, var(--surface-solid));
+  background: var(--tint); border-radius: var(--radius); padding: 14px 16px 16px; margin-bottom: 12px;
+  border: 1px solid color-mix(in srgb, var(--hue, var(--neutral)) 45%, transparent);
+}
+.xchg.fresh { animation: settle 1.2s ease-out; }
+@keyframes settle {
+  from { box-shadow: 0 0 0 6px color-mix(in srgb, var(--hue, var(--ink)) 40%, transparent); }
+  to { box-shadow: 0 0 0 0 transparent; }
+}
+
+.incoming { margin: 0 0 8px; max-width: 70ch; white-space: pre-wrap; overflow-wrap: anywhere; }
+.incoming.muted { color: var(--ink-3); font-style: italic; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-3); margin-bottom: 10px; }
+.tag {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 11px; border-radius: 999px;
+  font-weight: 600; font-size: 13px; color: var(--ink);
+  background: color-mix(in srgb, var(--hue, var(--neutral)) 70%, var(--surface-solid));
+}
+.reply {
+  margin: 0; padding: 10px 14px; background: var(--surface-solid);
+  border-radius: 14px 14px 14px 4px; max-width: 70ch; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.reply-label { font-size: 13px; color: var(--ink-3); margin: 0 0 4px; }
+.state { font-size: 13px; color: var(--ink-2); font-weight: 500; }
+.state.bad { color: var(--anger-ink); font-weight: 600; }
+.error-text { font-size: 13px; color: var(--ink-2); margin: 6px 0 0; }
+
+/* approvals */
+.pending-zone { margin-bottom: 22px; padding-bottom: 8px; border-bottom: 1px dashed var(--line); }
+.approval {
+  background: color-mix(in srgb, var(--hue, var(--neutral)) 22%, var(--surface-solid));
+  border: 1px solid color-mix(in srgb, var(--hue, var(--neutral)) 45%, transparent);
+  border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px;
+}
+.approval textarea { margin: 4px 0 10px; max-width: 70ch; }
+.approval .row { display: flex; gap: 10px; }
+
+/* side column */
+.mix { list-style: none; margin: 0 0 14px; padding: 0; }
+.mix li { display: grid; grid-template-columns: 78px 1fr 28px; align-items: center; gap: 8px; margin-bottom: 9px; font-size: 14px; }
+.mix .bar { height: 10px; border-radius: 999px; background: var(--line-soft); overflow: hidden; }
+.mix .bar i { display: block; height: 100%; background: var(--hue); border-radius: 999px; transition: width 0.5s ease; }
+.mix .n { text-align: right; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.summary { margin: 0 0 10px; color: var(--ink-2); }
+.ai-label { margin: 0 0 24px; color: var(--ink-3); font-size: 13px; }
+
+.demo { border-top: 1px dashed var(--line); padding-top: 18px; }
+.demo-log {
+  height: 220px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface-solid); padding: 10px; display: flex; flex-direction: column; gap: 6px;
+}
+.bubble { max-width: 85%; padding: 7px 12px; border-radius: 16px; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 14px; }
+.bubble.in { align-self: flex-start; background: color-mix(in srgb, var(--sadness) 30%, var(--surface-solid)); border-bottom-left-radius: 4px; }
+.bubble.out { align-self: flex-end; background: color-mix(in srgb, var(--surprise) 30%, var(--surface-solid)); border-bottom-right-radius: 4px; }
+.bubble.media { font-style: italic; color: var(--ink-3); }
+.demo-form { display: flex; gap: 8px; margin-top: 10px; }
+.demo-actions { display: flex; gap: 16px; margin-top: 6px; }
+
+/* --- small screens ------------------------------------------------------ */
+
+@media (max-width: 1080px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .feed-col { order: -1; }
+  .feed { max-height: 50vh; }
+}
+@media (max-width: 560px) {
+  .app { padding: 0 14px 32px; }
+  .top { flex-wrap: wrap; }
+  h1 { font-size: 24px; }
+  .brand p { margin-left: 0; }
+  .col { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .xchg.fresh { animation: none; }
+  body::before, .tick, .mix .bar i { transition: none; }
+}
