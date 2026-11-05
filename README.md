@@ -4,7 +4,6 @@ A chat auto-responder with a web dashboard. It watches a chat, works out how the
 other person is feeling, and writes a reply in the **same language, script and tone**.
 You decide whether it only practises, asks you first, or sends on its own.
 
-![Dashboard](docs/dashboard.png)
 
 ## Features
 
